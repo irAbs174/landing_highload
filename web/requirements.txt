@@ -1,0 +1,11 @@
+Django>=4.2
+djangorestframework
+psycopg2-binary
+celery[redis]>=5.2
+redis
+pymongo
+phonenumbers
+gunicorn
+python-dotenv
+django-environ
+ujson
