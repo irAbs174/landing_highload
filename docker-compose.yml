@@ -1,0 +1,72 @@
+version: '3.8'
+services:
+  web:
+    build: ./web
+    command: gunicorn subscribe_service.wsgi:application --bind 0.0.0.0:8000 --workers 3
+    volumes:
+      - ./web:/app
+    env_file:
+      - ./web/.env
+    depends_on:
+      - db
+      - redis
+      - mongo
+    networks:
+      - backend
+
+  worker:
+    build: ./web
+    command: celery -A subscribe_service worker --loglevel=info --concurrency=2
+    volumes:
+      - ./web:/app
+    env_file:
+      - ./web/.env
+    depends_on:
+      - db
+      - redis
+      - mongo
+    networks:
+      - backend
+
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: subscribe
+      POSTGRES_USER: subscribe
+      POSTGRES_PASSWORD: subscribe
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - backend
+
+  redis:
+    image: redis:7
+    ports:
+      - '6379:6379'
+    networks:
+      - backend
+
+  mongo:
+    image: mongo:6
+    ports:
+      - '27017:27017'
+    networks:
+      - backend
+
+  nginx:
+    image: nginx:stable
+    ports:
+      - '80:80'
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./web:/app
+    depends_on:
+      - web
+    networks:
+      - backend
+
+volumes:
+  pgdata:
+
+networks:
+  backend:
