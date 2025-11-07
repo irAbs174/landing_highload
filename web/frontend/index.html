@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ title }}</title>
+    {% load static %}
+    <style>
+        body {
+            font-family: sans-serif;
+            background-color: #fafafa;
+            color: #333;
+            text-align: center;
+            margin-top: 80px;
+        }
+        .container {
+            max-width: 400px;
+            margin: auto;
+            padding: 20px;
+        }
+        img.logo {
+            width: 120px;
+            margin-bottom: 20px;
+        }
+        input, button {
+            padding: 10px;
+            margin: 5px 0;
+            width: 100%;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <img src="{% static 'logo.png' %}" alt="Logo" class="logo">
+        <h1>سامانه عضویت با شماره تماس</h1>
+        <form id="subscribe-form">
+            <input type="text" id="phone" placeholder="Enter phone e.g. +98912..." required>
+            <button type="submit">ثبت شماره تلفن</button>
+        </form>
+        <div id="response"></div>
+    </div>
+
+    <script>
+        document.getElementById('subscribe-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const phone = document.getElementById('phone').value;
+            const res = await fetch('/api/subscribe/', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({phone})
+            });
+            const data = await res.json();
+            document.getElementById('response').innerText = JSON.stringify(data, null, 2);
+        });
+    </script>
+</body>
+</html>
